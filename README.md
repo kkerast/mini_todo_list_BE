@@ -14,7 +14,7 @@ npx sequelize init
 ```
 npx sequelize init
 ```
-
+```
 내 프로젝트 폴더 이름
 ├── models
 │   └── index.js
@@ -24,7 +24,7 @@ npx sequelize init
 ├── seeders
 ├── package-lock.json
 └── package.json
-
+```
 ```
 // config/config.json
 {
