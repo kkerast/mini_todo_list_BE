@@ -1,0 +1,17 @@
+{
+  "name": "mini_todo_list_be",
+  "version": "1.0.0",
+  "description": "[항해99 파트타임 1기][Chapter 4] 주특기 프로젝트",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "mongoose": "^7.1.1"
+  }
+}
