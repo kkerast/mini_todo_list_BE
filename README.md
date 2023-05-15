@@ -1,4 +1,5 @@
 # mini_todo_list_BE
+
 [항해99 파트타임 1기][Chapter 4] 주특기 프로젝트
 
 ```
@@ -9,11 +10,13 @@ npm install express sequelize mysql2
 npm install -D sequelize-cli nodemon
 
 # 설치한 sequelize를 초기화 하여, sequelize를 사용할 수 있는 구조를 생성합니다.
-npx sequelize init 
+npx sequelize init
 ```
+
 ```
 npx sequelize init
 ```
+
 ```
 내 프로젝트 폴더 이름
 ├── models
@@ -25,6 +28,7 @@ npx sequelize init
 ├── package-lock.json
 └── package.json
 ```
+
 ```
 // config/config.json
 {
@@ -42,4 +46,17 @@ npx sequelize init
     // ...
   }
 }
+```
+
+```
+npx sequelize db:create
+```
+
+```
+npx sequelize model:generate --name Users --attributes userId:INTEGER,email:string,password:string,nickname:string,age:INTEGER
+npx sequelize model:generate --name Todos --attributes todoId:INTEGER,userId:INTEGER,title:string,content:string,createdAt:date,updateAt:date,doneAt:date,done:boolean
+```
+
+```
+npx sequelize db:migrate
 ```
