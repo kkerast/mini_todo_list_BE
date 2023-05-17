@@ -1,9 +1,38 @@
 const express = require("express");
 const todos_router = express.Router();
+const sequelize = require("sequelize");
+const Op = sequelize.Op;
+const authMiddleware = require("../middlewares/auth-middleware");
+const { User, Todos } = require("../models");
 
 //Todo 리스트 조회 API
-todos_router.get("/todo", async (req, res, next) => {
-  return res.status(200).json({ message: "Todo 리스트" });
+todos_router.get("/todo", authMiddleware, async (req, res, next) => {
+  try {
+    //
+    const todoAll = await Todos.findAll({
+      attributes: ["todoId", "title", "createdAt", "updatedAt", "done"],
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          //attributes: ["userId", "nickname"],
+          where: { userId: 1 },
+        },
+      ],
+    })
+      .then(() => {
+        if (!todoAll) {
+          return res.status(200).json({ todoList: todoAll });
+        }
+      })
+      .error(() => {
+        throw new error();
+      });
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ errorMessage: "게시글 조회에 실패하였습니다." });
+  }
 });
 
 //Todo 리스트 추가 API
@@ -12,8 +41,39 @@ todos_router.post("/todo", async (req, res, next) => {
 });
 
 //Todo 할일 삭제 API
-todos_router.delete("/todo/:id", async (req, res, next) => {
-  return res.status(200).json({ message: "Todo 리스트 삭제" });
+todos_router.delete("/todo/:id", authMiddleware, async (req, res, next) => {
+  try {
+    const { todoId } = req.params;
+    const { userId } = res.locals.user;
+
+    const existTodo = Todos.findOne({ where: { todoId } });
+    if (!existTodo) {
+      return res.status(404).json({ message: "할일 존재하지 않습니다." });
+    }
+
+    if (existTodo.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "할일의 삭제 권한이 존재하지 않습니다." });
+    }
+
+    await Todos.destroy({
+      where: {
+        [Op.and]: [{ todoId }, { userId }],
+      },
+    })
+      .then(() => {
+        return res.status(200).json({ message: "게시글을 삭제하였습니다." });
+      })
+      .catch(() => {
+        return res.status(401).json({ message: "할일 삭제에 실패하였습니다." });
+      });
+    // return res.status(200).json({ message: "Todo 리스트 삭제" });
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ errorMessage: "할일 삭제에 실패하였습니다." });
+  }
 });
 
 //Todo 할일 완료하기 API
