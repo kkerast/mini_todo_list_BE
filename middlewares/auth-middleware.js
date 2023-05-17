@@ -27,7 +27,7 @@ module.exports = async (req, res, next) => {
       res.clearCookie("authorization");
       return res
         .status(403)
-        .json({ errorMessage: "전달된 쿠키에서 오류가 발생하였습니다." });
+        .json({ errorMessage: "전달된 쿠키에서 오류가 발생하였습니다.!" });
     }
 
     res.locals.user = user;

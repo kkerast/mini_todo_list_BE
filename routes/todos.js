@@ -15,7 +15,6 @@ todos_router.get("/todo", authMiddleware, async (req, res, next) => {
       include: [
         {
           model: User,
-          //attributes: ["userId", "nickname"],
           where: { userId: 1 },
         },
       ],
