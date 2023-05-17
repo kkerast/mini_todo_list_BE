@@ -5,7 +5,6 @@ const app = express();
 app.set("port", process.env.PORT || 3000);
 //const connect = require("./schemas/");
 const { authosRouter, todosRouter } = require("./routes");
-//connect();
 
 app.use(express.json());
 app.use(cookieParser);
