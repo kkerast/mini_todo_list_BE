@@ -1,10 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 
-//private key, public key 확인
-// httponly jwt blacklist
-// 윺효기간 짧게  ,refresh token  rotation 언제나 1회용
-//
 module.exports = async (req, res, next) => {
   try {
     const { authorization } = req.cookies;
@@ -17,7 +13,7 @@ module.exports = async (req, res, next) => {
         .json({ errorMessage: "로그인이 필요한 기능입니다." });
     }
 
-    if (tokenType !== "miniPJBearer") {
+    if (tokenType !== "Bearer") {
       return res
         .status(401)
         .json({ errorMessage: "전달된 쿠키에서 오류가 발생하였습니다." });
