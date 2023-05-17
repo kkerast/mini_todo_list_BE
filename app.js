@@ -3,7 +3,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 app.set("port", process.env.PORT || 3000);
-//const connect = require("./schemas/");
+
 const { authosRouter, todosRouter } = require("./routes");
 
 app.use(express.json());
