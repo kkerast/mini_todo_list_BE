@@ -19,6 +19,7 @@ authos_router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
     //이메일 검증
+
     //password 검증
 
     const user = await Users.findOne({ where: { email } });
