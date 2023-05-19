@@ -4,23 +4,58 @@ const authMiddleware = require("../middlewares/auth-middleware");
 const { Todos, Users } = require("../models");
 
 // ◎ Todo 리스트 조회 API
-todos_router.get("/todo", async (req, res, next) => {
-  return res.status(200).json({ message: "Todo 리스트" });
+//Todo 리스트 조회 API
+todos_router.get("/todo", authMiddleware, async (req, res, next) => {
+  try {
+    //
+    const todoAll = await Todos.findAll({
+      attributes: ["todoId", "title", "createdAt", "updatedAt", "done"],
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          where: { userId: 1 },
+        },
+      ],
+    })
+      .then(() => {
+        if (!todoAll) {
+          return res.status(200).json({ todoList: todoAll });
+        }
+      })
+      .error(() => {
+        throw new error();
+      });
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ errorMessage: "게시글 조회에 실패하였습니다." });
+  }
 });
 
 // ◎ Todo 리스트 추가 API
 todos_router.post("/todo", authMiddleware, async (req, res, next) => {
-  const { email } = res.locals.user;
-  const { title, content, date } = req.body;
+  try {
+    const { userId } = res.locals.user;
+    const { title, content } = req.body;
 
-  const todo_add = await Todos.create({
-    email: email,
-    title,
-    content,
-    date,
-  });
-  console.log(todo_add);
-  return res.status(200).json({ message: "Todo 리스트 추가" });
+    if (typeof title !== "string" || title === "") {
+      return res.status(412).json({ message: "제목을 확인해 주세요" });
+    }
+    if (typeof content !== "string" || content === "") {
+      return res.status(412).json({ message: "작성 내용을 확인해 주세요" });
+    }
+    const todo = await Todos.create({
+      userId: userId,
+      title,
+      content,
+      done: false,
+    });
+    res.status(201).json({ data: todo, message: "Todo 리스트 추가 성공" });
+  } catch (error) {
+    res.status(400).json({ message: "게시글 등록 실패" });
+    console.error(error);
+  }
 });
 
 // ◎ Todo 할일 삭제 API
