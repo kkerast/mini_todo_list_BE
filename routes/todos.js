@@ -7,24 +7,21 @@ const { Todos, Users } = require("../models");
 //Todo 리스트 조회 API
 todos_router.get("/todo", authMiddleware, async (req, res, next) => {
   try {
+    const { userId } = res.locals.user;
     const todoAll = await Todos.findAll({
       attributes: [
         "todoId",
         "title",
         "content",
+        "done",
         "createdAt",
         "updatedAt",
-        "done",
       ],
       order: [["createdAt", "DESC"]],
-      include: [
-        {
-          model: Users,
-          where: { userId: 1 },
-        },
-      ],
+      where: { userId },
     })
       .then(function (results) {
+        console.log(results);
         return res.status(200).json({ todoList: results });
       })
       .catch((error) => {
@@ -63,33 +60,42 @@ todos_router.post("/todo", authMiddleware, async (req, res, next) => {
 });
 
 // ◎ Todo 할일 삭제 API
-todos_router.delete("/todo/:id", async (req, res, next) => {
-  const { todoId } = req.params;
-  const { userId } = res.locals.user;
+//Todo 할일 삭제 API
+todos_router.delete("/todo/:id", authMiddleware, async (req, res, next) => {
+  try {
+    const { id } = req.params; //Todos.todoId
+    const { userId } = res.locals.user; //Users.userId
 
-  const existTodo = Todos.findOne({ where: { todoId } });
-  if (!existTodo) {
-    return res.status(404).json({ message: "할일 존재하지 않습니다." });
-  }
+    const existTodo = await Todos.findOne({ where: { todoId: id } });
+    if (!existTodo) {
+      return res.status(404).json({ message: "할일 존재하지 않습니다." });
+    }
 
-  if (existTodo.userId !== userId) {
-    return res
-      .status(403)
-      .json({ message: "할일의 삭제 권한이 존재하지 않습니다." });
-  }
+    if (existTodo.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "할일의 삭제 권한이 존재하지 않습니다." });
+    }
 
-  await Todos.destroy({
-    where: {
-      [Op.and]: [{ todoId }, { userId }],
-    },
-  })
-    .then(() => {
-      return res.status(200).json({ message: "게시글을 삭제하였습니다." });
+    await Todos.destroy({
+      where: { todoId: id, userId: userId },
+
+      // where: {
+      //   [Op.and]: [{ todoId: id }, { userId }],
+      // },
     })
-    .catch(() => {
-      return res.status(401).json({ message: "할일 삭제에 실패하였습니다." });
-    });
-  return res.status(200).json({ message: "Todo 리스트 삭제" });
+      .then(() => {
+        return res.status(200).json({ message: "게시글을 삭제하였습니다." });
+      })
+      .catch(() => {
+        return res.status(401).json({ message: "할일 삭제에 실패하였습니다." });
+      });
+    // return res.status(200).json({ message: "Todo 리스트 삭제" });
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ errorMessage: "할일 삭제에 실패하였습니다." });
+  }
 });
 
 // ◎ Todo 할일 완료하기 API
@@ -97,24 +103,29 @@ todos_router.patch("/todo/:id", authMiddleware, async (req, res, next) => {
   const { userId } = res.locals.user;
   const { id } = req.params;
 
-  const targetTodo = await Todos.findOne({
-    where: { todoId: id },
-  });
+  try {
+    const targetTodo = await Todos.findOne({
+      where: { todoId: id },
+    });
 
-  if (!targetTodo) {
-    return res
-      .status(412)
-      .json({ message: "완료/취소할 할일이 존재하지 않습니다." });
-  } else if (targetTodo.userId !== userId) {
-    return res
-      .status(412)
-      .json({ message: "완료/취소 권한이 존재하지 않습니다." });
-  } else if (targetTodo.userId === userId) {
-    (await targetTodo.done) === true
-      ? (targetTodo.done = false)
-      : (targetTodo.done = true);
-    targetTodo.save();
-    return res.status(200).json({ message: "완료/취소 성공!" });
+    if (!targetTodo) {
+      return res
+        .status(412)
+        .json({ message: "완료/취소할 할일이 존재하지 않습니다." });
+    } else if (targetTodo.userId !== userId) {
+      return res
+        .status(412)
+        .json({ message: "완료/취소 권한이 존재하지 않습니다." });
+    } else if (targetTodo.userId === userId) {
+      (await targetTodo.done) === true
+        ? (targetTodo.done = false)
+        : (targetTodo.done = true);
+      targetTodo.save();
+      return res.status(200).json({ message: "완료/취소 성공!" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "완료/취소에 실패하였습니다." });
   }
 });
 
@@ -158,36 +169,25 @@ todos_router.get("/detail/:id", authMiddleware, async (req, res, next) => {
 });
 
 // ◎ Todo 할일 수정하기 API
-todos_router.put("/detail/:id", async (req, res, next) => {
+todos_router.put("/detail/:id", authMiddleware, async (req, res, next) => {
   const { userId } = res.locals.user;
   const { id } = req.params;
-  const { title, content, date } = req.body;
+  const { title, content } = req.body;
 
   // id값으로 찾은 Todos의 userId가 로그인한 userId와 같은지 확인
-  const todo = await Todo.findOne({ where: { id } });
+  const todo = await Todos.findOne({ where: { todoId: id } });
   if (todo.userId !== userId) {
     return res.status(403).json({ message: "수정 권한이 없습니다." });
   }
-
-  await Posts.update(
-    { title, content, date },
-    {
-      where: {
-        [Op.and]: [{ id }],
-      },
-    }
-  );
+  console.log(new Date());
+  await todo.update({ title, content, updatedAt: new Date() });
 
   return res.status(200).json({ message: "Todo 할일 수정하기" });
 });
 
-//Todo 완료페이지 완료리스트 API
-todos_router.get("/", async (req, res, next) => {
-  return res.status(200).json({ message: "Todo 완료리스트" });
-});
-
 // ◎ Todo 완료페이지 완료리스트 API
 todos_router.get("/", authMiddleware, async (req, res, next) => {
+  console.log("완료리스트 조회");
   const { userId } = res.locals.user;
 
   try {
@@ -205,17 +205,7 @@ todos_router.get("/", authMiddleware, async (req, res, next) => {
     });
 
     if (doneList.length > 0) {
-      let result = doneList.map((done) => {
-        return {
-          userId: done.userId,
-          todoId: done.todoId,
-          title: done.title,
-          content: done.content,
-          createdAt: done.createdAt,
-          createdAt: done.updatedAt,
-        };
-      });
-      res.status(200).json({ doneList: result });
+      res.status(200).json({ doneList: doneList });
     } else if (doneList.length === 0) {
       res.status(400).json({ message: "완료한 할일이 존재하지 않습니다." });
     }
