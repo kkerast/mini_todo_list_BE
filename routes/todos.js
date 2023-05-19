@@ -26,7 +26,7 @@ todos_router.get("/todo", authMiddleware, async (req, res, next) => {
   } catch (error) {
     return res
       .status(400)
-      .json({ errorMessage: "게시글 조회에 실패하였습니다." + error });
+      .json({ errorMessage: "게시글 조회에 실패하였습니다." });
   }
 });
 
