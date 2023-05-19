@@ -8,7 +8,14 @@ const { Todos, Users } = require("../models");
 todos_router.get("/todo", authMiddleware, async (req, res, next) => {
   try {
     const todoAll = await Todos.findAll({
-      attributes: ["todoId", "title", "createdAt", "updatedAt", "done"],
+      attributes: [
+        "todoId",
+        "title",
+        "content",
+        "createdAt",
+        "updatedAt",
+        "done",
+      ],
       order: [["createdAt", "DESC"]],
       include: [
         {
@@ -57,6 +64,31 @@ todos_router.post("/todo", authMiddleware, async (req, res, next) => {
 
 // ◎ Todo 할일 삭제 API
 todos_router.delete("/todo/:id", async (req, res, next) => {
+  const { todoId } = req.params;
+  const { userId } = res.locals.user;
+
+  const existTodo = Todos.findOne({ where: { todoId } });
+  if (!existTodo) {
+    return res.status(404).json({ message: "할일 존재하지 않습니다." });
+  }
+
+  if (existTodo.userId !== userId) {
+    return res
+      .status(403)
+      .json({ message: "할일의 삭제 권한이 존재하지 않습니다." });
+  }
+
+  await Todos.destroy({
+    where: {
+      [Op.and]: [{ todoId }, { userId }],
+    },
+  })
+    .then(() => {
+      return res.status(200).json({ message: "게시글을 삭제하였습니다." });
+    })
+    .catch(() => {
+      return res.status(401).json({ message: "할일 삭제에 실패하였습니다." });
+    });
   return res.status(200).json({ message: "Todo 리스트 삭제" });
 });
 
