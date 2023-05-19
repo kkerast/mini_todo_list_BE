@@ -103,6 +103,7 @@ authos_router.post("/login", async (req, res, next) => {
 
 // ◎ 로그아웃 API
 authos_router.post("/logout", async (req, res, next) => {
+  return res.cookie("user", "").status(200).json({ message: "로그아웃 성공" });
   return res.status(200).json({ message: "로그아웃 성공" });
 });
 
