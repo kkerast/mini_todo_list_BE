@@ -7,29 +7,26 @@ const { Todos, Users } = require("../models");
 //Todo 리스트 조회 API
 todos_router.get("/todo", authMiddleware, async (req, res, next) => {
   try {
-    //
     const todoAll = await Todos.findAll({
       attributes: ["todoId", "title", "createdAt", "updatedAt", "done"],
       order: [["createdAt", "DESC"]],
       include: [
         {
-          model: User,
+          model: Users,
           where: { userId: 1 },
         },
       ],
     })
-      .then(() => {
-        if (!todoAll) {
-          return res.status(200).json({ todoList: todoAll });
-        }
+      .then(function (results) {
+        return res.status(200).json({ todoList: results });
       })
-      .error(() => {
+      .catch((error) => {
         throw new error();
       });
   } catch (error) {
     return res
       .status(400)
-      .json({ errorMessage: "게시글 조회에 실패하였습니다." });
+      .json({ errorMessage: "게시글 조회에 실패하였습니다." + error });
   }
 });
 
