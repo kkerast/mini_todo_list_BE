@@ -1,13 +1,14 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const app = express();
 
+const app = express();
 app.set("port", process.env.PORT || 3000);
 
-const { authosRouter, todosRouter } = require("./routes");
+const { authosRouter, todosRouter } = require("./routes/index.js");
 
 app.use(express.json());
-app.use(cookieParser);
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use("/api", [authosRouter, todosRouter]);
 
 app.listen(app.get("port"), () => {

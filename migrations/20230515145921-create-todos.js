@@ -3,27 +3,26 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("Todos", {
-      id: {
+      todoId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      todoId: {
-        type: Sequelize.INTEGER,
-      },
       userId: {
+        allowNull: false,
         type: Sequelize.INTEGER,
       },
       title: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       content: {
         type: Sequelize.STRING,
       },
       createdAt: {
+        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
       },
       updatedAt: {
         type: Sequelize.DATE,
@@ -32,6 +31,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       done: {
+        allowNull: false,
         type: Sequelize.BOOLEAN,
       },
     });
