@@ -2,6 +2,7 @@ const express = require("express");
 const authos_router = express.Router();
 const { Users } = require("../models");
 const jwt = require("jsonwebtoken");
+const authMiddleware = require("../middlewares/auth-middleware");
 
 // ◎ 회원가입 API
 authos_router.post("/signup", async (req, res, next) => {
@@ -67,8 +68,20 @@ authos_router.post("/signup", async (req, res, next) => {
 });
 
 // ◎ 회원정보 불러오기  api
-authos_router.get("/auth", async (req, res, next) => {
-  return res.status(200).json({ message: "회원정보 불러오기" });
+authos_router.get("/auth", authMiddleware, async (req, res, next) => {
+  const { userId } = res.locals.user;
+  const userInfo = Users.findOne(
+    { attributes: ["email", "nickname", "age"] },
+    { where: { userId } }
+  )
+    .then((result) => {
+      return res.status(200).json({ userInfo: result });
+    })
+    .catch(() => {
+      return res
+        .status(200)
+        .json({ errorMessage: "회원정보 조회에 실패하였습니다" });
+    });
 });
 
 // ◎ 로그인 API
@@ -84,7 +97,7 @@ authos_router.post("/login", async (req, res, next) => {
   if (!user || user.password !== password) {
     return res
       .status(412)
-      .json({ errorMessage: "닉네임 또는 패스워드를 확인해주세요." });
+      .json({ errorMessage: "이메일 또는 패스워드를 확인해주세요." });
   }
 
   const token = jwt.sign(
