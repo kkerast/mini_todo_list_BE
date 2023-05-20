@@ -3,12 +3,14 @@ const authos_router = express.Router();
 const { Users } = require("../models");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middlewares/auth-middleware");
+const crypto = require("crypto");
 
 // ◎ 회원가입 API
 authos_router.post("/signup", async (req, res, next) => {
   const { email, password, nickname, age } = req.body;
   try {
     // 닉네임으로 중복가입 여부 확인
+
     const isExistNick = await Users.findOne({
       where: { nickname: nickname },
     });
@@ -45,6 +47,7 @@ authos_router.post("/signup", async (req, res, next) => {
     }
 
     // 패스워드 형식 확인: 특수문자(@$!%*?&)의무포함, 알파벳 소문자 의무포함, 대문자 가능, 4~20자
+
     const pwCheck = /^(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{4,20}$/;
 
     if (!pwCheck.test(password)) {
@@ -60,7 +63,11 @@ authos_router.post("/signup", async (req, res, next) => {
         .json({ errorMessage: "패스워드에 닉네임이 포함되어 있습니다." });
       return;
     }
-    await Users.create({ email, password, nickname, age });
+    const crypyedPw = crypto
+      .createHash("sha512")
+      .update(password)
+      .digest("base64");
+    await Users.create({ email, password: crypyedPw, nickname, age });
     return res.status(201).json({ message: "회원가입 성공" });
   } catch (error) {
     // 예상치 못한 에러 대응
@@ -70,32 +77,31 @@ authos_router.post("/signup", async (req, res, next) => {
 
 // ◎ 회원정보 불러오기  api
 authos_router.get("/auth", authMiddleware, async (req, res, next) => {
-  const { userId } = res.locals.user;
-  const userInfo = Users.findOne(
-    { attributes: ["email", "nickname", "age"] },
-    { where: { userId } }
-  )
-    .then((result) => {
-      return res.status(200).json({ userInfo: result });
-    })
-    .catch(() => {
-      return res
-        .status(200)
-        .json({ errorMessage: "회원정보 조회에 실패하였습니다" });
+  try {
+    const { userId } = res.locals.user;
+    const userInfo = await Users.findOne({
+      attributes: ["email", "nickname", "age"],
+      where: { userId: userId },
     });
+    console.log(userInfo);
+    return res.status(200).json({ userInfo: userInfo });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "회원정보 조회에 실패하였습니다." });
+  }
 });
 
 // ◎ 로그인 API
 authos_router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    //이메일 검증
-
-    //password 검증
+    const crypyedPw = crypto
+      .createHash("sha512")
+      .update(password)
+      .digest("base64");
 
     const user = await Users.findOne({ where: { email } });
-
-    if (!user || user.password !== password) {
+    if (!user || user.password !== crypyedPw) {
       return res
         .status(412)
         .json({ errorMessage: "이메일 또는 패스워드를 확인해주세요." });
