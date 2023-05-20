@@ -132,3 +132,4 @@ dist
 # config
 config/
 config.json
+tsconfig.json
