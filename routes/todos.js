@@ -46,11 +46,15 @@ todos_router.post("/todo", authMiddleware, async (req, res, next) => {
     if (typeof content !== "string" || content === "") {
       return res.status(412).json({ message: "작성 내용을 확인해 주세요" });
     }
+    let date = new Date();  
+    koreantime = date.setHours(date.getHours() + 9);
     const todo = await Todos.create({
       userId: userId,
       title,
       content,
       done: false,
+      createdAt: koreantime,
+      updatedAt: koreantime,
     });
     res.status(201).json({ data: todo, message: "Todo 리스트 추가 성공" });
   } catch (error) {
@@ -117,10 +121,17 @@ todos_router.patch("/todo/:id", authMiddleware, async (req, res, next) => {
         .status(412)
         .json({ message: "완료/취소 권한이 존재하지 않습니다." });
     } else if (targetTodo.userId === userId) {
-      (await targetTodo.done) === true
-        ? (targetTodo.done = false)
-        : (targetTodo.done = true);
-      targetTodo.save();
+      // (await targetTodo.done) === true
+      //   ? (targetTodo.done = false)
+      //   : (targetTodo.done = true);
+      // targetTodo.save();
+      let date = new Date();
+      koreantime = date.setHours(date.getHours() + 9);
+      await Todos.update(
+        { done: !targetTodo.done , doneAt: koreantime },
+        { where: { todoId: id } }
+      );
+      
       return res.status(200).json({ message: "완료/취소 성공!" });
     }
   } catch (error) {
@@ -179,8 +190,9 @@ todos_router.put("/detail/:id", authMiddleware, async (req, res, next) => {
   if (todo.userId !== userId) {
     return res.status(403).json({ message: "수정 권한이 없습니다." });
   }
-  console.log(new Date());
-  await todo.update({ title, content, updatedAt: new Date() });
+  let date = new Date();  
+  koreantime = date.setHours(date.getHours() + 9);
+  await todo.update({ title, content, updatedAt: koreantime });
 
   return res.status(200).json({ message: "Todo 할일 수정하기" });
 });

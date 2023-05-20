@@ -67,7 +67,9 @@ authos_router.post("/signup", async (req, res, next) => {
       .createHash("sha512")
       .update(password)
       .digest("base64");
-    await Users.create({ email, password: crypyedPw, nickname, age });
+      let date = new Date();  
+      koreantime = date.setHours(date.getHours() + 9);
+    await Users.create({ email, password: crypyedPw, nickname, age ,createdAt: koreantime});
     return res.status(201).json({ message: "회원가입 성공" });
   } catch (error) {
     // 예상치 못한 에러 대응
