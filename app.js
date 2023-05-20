@@ -1,7 +1,9 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 app.set("port", process.env.PORT || 3000);
 
 const { authosRouter, todosRouter } = require("./routes/index.js");

@@ -14,7 +14,7 @@ npx sequelize init
 ```
 
 ```
-npx sequelize init
+npm install cors
 ```
 
 ```
