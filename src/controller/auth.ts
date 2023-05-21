@@ -1,13 +1,13 @@
-const express = require("express");
-const authos_router = express.Router();
-const { Users } = require("../models");
-const jwt = require("jsonwebtoken");
-const authMiddleware = require("../middlewares/auth-middleware");
-const crypto = require("crypto");
+import { RequestHandler } from "express";
 
-// ◎ 회원가입 API
-authos_router.post("/signup", async (req, res, next) => {
+import { Users } from "../models/users";
+import * as crypto from "crypto";
+import jwt from "jsonwebtoken";
+
+// @ 회원가입 api
+export const signup: RequestHandler = async (req, res, next) => {
   const { email, password, nickname, age } = req.body;
+
   try {
     // 닉네임으로 중복가입 여부 확인
 
@@ -67,16 +67,24 @@ authos_router.post("/signup", async (req, res, next) => {
       .createHash("sha512")
       .update(password)
       .digest("base64");
-    await Users.create({ email, password: crypyedPw, nickname, age });
+    let date = new Date();
+    const koreantime = date.setHours(date.getHours() + 9);
+    await Users.create({
+      email,
+      password: crypyedPw,
+      nickname,
+      age,
+      createdAt: koreantime,
+    });
     return res.status(201).json({ message: "회원가입 성공" });
   } catch (error) {
     // 예상치 못한 에러 대응
     return res.status(400).json({ message: "요청이 올바르지 않습니다." });
   }
-});
+};
 
 // ◎ 회원정보 불러오기  api
-authos_router.get("/auth", authMiddleware, async (req, res, next) => {
+export const getUserInfo: RequestHandler = async (req, res, next) => {
   try {
     const { userId } = res.locals.user;
     const userInfo = await Users.findOne({
@@ -89,10 +97,10 @@ authos_router.get("/auth", authMiddleware, async (req, res, next) => {
     console.error(error);
     res.status(400).json({ message: "회원정보 조회에 실패하였습니다." });
   }
-});
+};
 
-// ◎ 로그인 API
-authos_router.post("/login", async (req, res, next) => {
+// ◎ 로그인  api
+export const login: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const crypyedPw = crypto
@@ -119,15 +127,12 @@ authos_router.post("/login", async (req, res, next) => {
   } catch (error) {
     return res.json({ message: "로그인에 실패하였습니다." });
   }
-});
+};
 
-// ◎ 로그아웃 API
-authos_router.post("/logout", async (req, res, next) => {
+// ◎ 로그아웃  api
+export const logout: RequestHandler = async (req, res, next) => {
   return res
     .cookie("authorization", "")
     .status(200)
     .json({ message: "로그아웃 성공" });
-  return res.status(200).json({ message: "로그아웃 성공" });
-});
-
-module.exports = authos_router;
+};
