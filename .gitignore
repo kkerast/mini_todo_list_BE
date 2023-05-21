@@ -131,4 +131,7 @@ dist
 
 # config
 config/
-config.json
+config.json/
+config.js
+src/db/
+dist/db/

@@ -1,76 +1,23 @@
-# mini_todo_list_BE
+## express, sequelize, mysql 그리고 typescript를 활용한 todo-list API.
 
-[항해99 파트타임 1기][Chapter 4] 주특기 프로젝트
+#### - [항해99 파트타임 1기][Chapter 4] 주특기 프로젝트
 
-```
-# express, sequelize, mysql2 라이브러리를 설치합니다.
-npm install express sequelize mysql2
+---
 
-# sequelize-cli, nodemon 라이브러리를 DevDependency로 설치합니다.
-npm install -D sequelize-cli nodemon
+#### 1. 주요 API list
 
-# 설치한 sequelize를 초기화 하여, sequelize를 사용할 수 있는 구조를 생성합니다.
-npx sequelize init
-```
+- 회원가입
+- 로그인
+- 로그아웃
+- 로그인한 유저의 할일목록 조회
+- 할일 생성하기
+- 로그인한 회원의 정보 불러오기
+- 할일 삭제하기
+- 할일 완료/취소하기
+- 할일 상세보기
+- 할일 수정하기
+- 완료된 할일 목록 조회하기
 
-```
-npm install cors
-```
+#### 2. API 상세 명세서
 
-```
-내 프로젝트 폴더 이름
-├── models
-│   └── index.js
-├── config
-│   └── config.json
-├── migrations
-├── seeders
-├── package-lock.json
-└── package.json
-```
-
-API 실행 전, config.json 에서 아래처럼 "define" 추가하시기 바랍니다.
-
-"development": {
-.
-.
-.
-"define": {
-"timestamps": false
-}
-},
-
-```
-// config/config.json
-{
-  "development": {
-    "username": "root",
-    "password": "4321aaaa",
-    "database": "express_sequelize_init",
-    "host": "express-database.clx5r59t.ap-northeast-2.rds.amazonaws.com",
-    "dialect": "mysql",
-    "define": {
-      "timestamps": false
-    }
-  },
-  "test": {
-    // ...
-  },
-  "production": {
-    // ...
-  }
-}
-```
-
-```
-npx sequelize db:create
-```
-
-```
-npx sequelize model:generate --name Users --attributes userId:INTEGER,email:string,password:string,nickname:string,age:INTEGER
-npx sequelize model:generate --name Todos --attributes todoId:INTEGER,userId:INTEGER,title:string,content:string,createdAt:date,updateAt:date,doneAt:date,done:boolean
-```
-
-```
-npx sequelize db:migrate
-```
+- https://www.notion.so/887a54eb7a6542149c8ed6889b33fced?v=c5f053e6f49c44bdb2f1f19e881d584f&pvs=4
