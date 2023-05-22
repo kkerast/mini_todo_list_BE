@@ -187,7 +187,8 @@ export const updateToDo: RequestHandler = async (req, res, next) => {
       .status(403)
       .json({ message: "할일이 존재하지 않거나 수정 권한이 없습니다." });
   }
-  let date = new Date();
+
+  let date: Date = new Date();
   const koreantime = date.setHours(date.getHours() + 9);
   await todo.update({ title, content, updatedAt: koreantime });
 

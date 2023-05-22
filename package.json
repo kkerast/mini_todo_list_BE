@@ -20,9 +20,12 @@
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
+    "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.2.1",
-    "nodemon": "^2.0.22"
+    "install": "^0.13.0",
+    "nodemon": "^2.0.22",
+    "npm": "^9.6.7"
   }
 }

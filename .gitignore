@@ -130,8 +130,8 @@ dist
 .pnp.*
 
 # config
-config/
-config.json/
-config.js
-src/db/
-dist/db/
+# config/
+# config.json/
+# config.js
+# src/db/
+# dist/db/
