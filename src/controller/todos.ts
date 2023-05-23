@@ -16,6 +16,7 @@ export const getAllToDo: RequestHandler = async (req, res, next) => {
         "done",
         "createdAt",
         "updatedAt",
+        "duedateAt",
       ],
       order: [["createdAt", "DESC"]],
       where: { userId },
