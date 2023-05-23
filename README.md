@@ -21,3 +21,18 @@
 #### 2. API 상세 명세서
 
 - https://www.notion.so/887a54eb7a6542149c8ed6889b33fced?v=c5f053e6f49c44bdb2f1f19e881d584f&pvs=4
+
+
+### 3. 실행방법
+
+```
+tsc && nodemon dist/app.js
+```
+
+.env
+```
+DB_HOST=DB의 호스트명
+DB_USERNAME=사용자명
+DB_PASSWORD=DB암호
+DB_DATABASE=데이터베이스 이름
+```
