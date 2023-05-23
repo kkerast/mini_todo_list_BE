@@ -178,7 +178,7 @@ export const getTodoById: RequestHandler = async (req, res, next) => {
 export const updateToDo: RequestHandler = async (req, res, next) => {
   const { userId } = res.locals.user;
   const { id } = req.params;
-  const { title, content } = req.body;
+  const { title, content, duedateAt } = req.body;
 
   // id값으로 찾은 Todos의 userId가 로그인한 userId와 같은지 확인
   const todo = await Todos.findOne({ where: { todoId: id } });
@@ -192,6 +192,7 @@ export const updateToDo: RequestHandler = async (req, res, next) => {
     title,
     content,
     updatedAt: new Date(),
+    duedateAt,
   });
 
   return res.status(200).json({ message: "Todo 할일 수정완료" });
