@@ -58,6 +58,12 @@ export class Todos extends Model {
     allowNull: true,
     type: DataType.DATE,
   })
+  duedateAt!: Date;
+
+  @Column({
+    allowNull: true,
+    type: DataType.DATE,
+  })
   doneAt!: Date;
 
   @Column({

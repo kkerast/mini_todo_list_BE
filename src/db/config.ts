@@ -5,12 +5,11 @@ import { Users } from "../models/users";
 
 const connection = new Sequelize({
   dialect: "mysql",
-  host: process.env.HOST,
-  username: process.env.USERNAME,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
+  host: process.env.DB_HOST,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
   logging: false,
-  // timezone: "Asia/Seoul",
   models: [Todos, Users],
 });
 

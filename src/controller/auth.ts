@@ -67,14 +67,13 @@ export const signup: RequestHandler = async (req, res, next) => {
       .createHash("sha512")
       .update(password)
       .digest("base64");
-    let date = new Date();
-    const koreantime = date.setHours(date.getHours() + 9);
+
     await Users.create({
       email,
       password: crypyedPw,
       nickname,
       age,
-      createdAt: koreantime,
+      createdAt: new Date(),
     });
     return res.status(201).json({ message: "회원가입 성공" });
   } catch (error) {

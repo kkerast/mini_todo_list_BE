@@ -38,7 +38,7 @@ export const getAllToDo: RequestHandler = async (req, res, next) => {
 export const createToDo: RequestHandler = async (req, res, next) => {
   try {
     const { userId } = res.locals.user;
-    const { title, content } = req.body;
+    const { title, content ,duedateAt } = req.body;
 
     if (typeof title !== "string" || title === "") {
       return res.status(412).json({ message: "제목을 확인해 주세요" });
@@ -46,15 +46,15 @@ export const createToDo: RequestHandler = async (req, res, next) => {
     if (typeof content !== "string" || content === "") {
       return res.status(412).json({ message: "작성 내용을 확인해 주세요" });
     }
-    let date = new Date();
-    const koreantime = date.setHours(date.getHours() + 9);
+
     const todo = await Todos.create({
       userId: userId,
       title,
       content,
       done: false,
-      createdAt: koreantime,
-      updatedAt: koreantime,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      duedateAt,
     });
     res.status(201).json({ data: todo, message: "Todo 리스트 추가 성공" });
   } catch (error) {
@@ -120,10 +120,9 @@ export const finishToDo: RequestHandler = async (req, res, next) => {
         .status(412)
         .json({ message: "완료/취소 권한이 존재하지 않습니다." });
     } else if (targetTodo.userId === userId) {
-      let date = new Date();
-      const koreantime = date.setHours(date.getHours() + 9);
+
       await Todos.update(
-        { done: !targetTodo.done, doneAt: koreantime },
+        { done: !targetTodo.done, doneAt: new Date() },
         { where: { todoId: id } }
       );
 
@@ -188,14 +187,10 @@ export const updateToDo: RequestHandler = async (req, res, next) => {
       .json({ message: "할일이 존재하지 않거나 수정 권한이 없습니다." });
   }
 
-  let date = new Date().toLocaleString();
-  console.log(date);
-  // console.log(date.toLocaleDateString());
-  // const koreantime = date.setHours(date.getHours() + 9);
   const result = await todo.update({
     title,
     content,
-    updatedAt: "2021-05-22 14:40:00",
+    updatedAt: new Date(),
   });
 
   return res.status(200).json({ message: "Todo 할일 수정완료" });

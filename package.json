@@ -16,7 +16,9 @@
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^3.3.1",
     "sequelize": "^6.31.1",
-    "sequelize-typescript": "^2.1.5"
+    "sequelize-typescript": "^2.1.5",
+    "tsc": "^2.0.4",
+    "typescript": "^5.0.4"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
