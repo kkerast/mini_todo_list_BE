@@ -134,6 +134,7 @@ export const login: RequestHandler = async (req, res, next) => {
       "miniproject_key_256"
     );
     res.cookie("authorization", `Bearer ${token}`);
+    res.set({ authorization: `Bearer ${token}` });
 
     res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
     res.setHeader(
