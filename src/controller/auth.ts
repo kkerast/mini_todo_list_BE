@@ -67,15 +67,21 @@ export const signup: RequestHandler = async (req, res, next) => {
       .createHash("sha512")
       .update(password)
       .digest("base64");
-    let date = new Date();
-    const koreantime = date.setHours(date.getHours() + 9);
+
     await Users.create({
       email,
       password: crypyedPw,
       nickname,
       age,
-      createdAt: koreantime,
+      createdAt: new Date(),
     });
+
+    res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+    ); // 모든 HTTP 메서드 허용
+    res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
     return res.status(201).json({ message: "회원가입 성공" });
   } catch (error) {
     // 예상치 못한 에러 대응
@@ -91,7 +97,13 @@ export const getUserInfo: RequestHandler = async (req, res, next) => {
       attributes: ["email", "nickname", "age"],
       where: { userId: userId },
     });
-    console.log(userInfo);
+
+    res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+    ); // 모든 HTTP 메서드 허용
+    res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
     return res.status(200).json({ userInfo: userInfo });
   } catch (error) {
     console.error(error);
@@ -123,6 +135,13 @@ export const login: RequestHandler = async (req, res, next) => {
     );
     res.cookie("authorization", `Bearer ${token}`);
 
+    res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+    ); // 모든 HTTP 메서드 허용
+    res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
+
     return res.status(200).json({ message: "로그인 성공" });
   } catch (error) {
     return res.json({ message: "로그인에 실패하였습니다." });
@@ -131,6 +150,12 @@ export const login: RequestHandler = async (req, res, next) => {
 
 // ◎ 로그아웃  api
 export const logout: RequestHandler = async (req, res, next) => {
+  res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  ); // 모든 HTTP 메서드 허용
+  res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
   return res
     .cookie("authorization", "")
     .status(200)

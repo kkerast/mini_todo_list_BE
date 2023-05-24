@@ -16,12 +16,18 @@ export const getAllToDo: RequestHandler = async (req, res, next) => {
         "done",
         "createdAt",
         "updatedAt",
+        "duedateAt",
       ],
       order: [["createdAt", "DESC"]],
       where: { userId },
     })
       .then(function (results) {
-        console.log(results);
+        res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+        res.setHeader(
+          "Access-Control-Allow-Methods",
+          "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+        ); // 모든 HTTP 메서드 허용
+        res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
         return res.status(200).json({ todoList: results });
       })
       .catch((error) => {
@@ -38,7 +44,7 @@ export const getAllToDo: RequestHandler = async (req, res, next) => {
 export const createToDo: RequestHandler = async (req, res, next) => {
   try {
     const { userId } = res.locals.user;
-    const { title, content } = req.body;
+    const { title, content, duedateAt } = req.body;
 
     if (typeof title !== "string" || title === "") {
       return res.status(412).json({ message: "제목을 확인해 주세요" });
@@ -46,16 +52,22 @@ export const createToDo: RequestHandler = async (req, res, next) => {
     if (typeof content !== "string" || content === "") {
       return res.status(412).json({ message: "작성 내용을 확인해 주세요" });
     }
-    let date = new Date();
-    const koreantime = date.setHours(date.getHours() + 9);
+
     const todo = await Todos.create({
       userId: userId,
       title,
       content,
       done: false,
-      createdAt: koreantime,
-      updatedAt: koreantime,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      duedateAt,
     });
+    res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+    ); // 모든 HTTP 메서드 허용
+    res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
     res.status(201).json({ data: todo, message: "Todo 리스트 추가 성공" });
   } catch (error) {
     res.status(400).json({ message: "게시글 등록 실패" });
@@ -88,6 +100,12 @@ export const deleteToDo: RequestHandler = async (req, res, next) => {
       where: { todoId: id, userId: userId },
     })
       .then(() => {
+        res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+        res.setHeader(
+          "Access-Control-Allow-Methods",
+          "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+        ); // 모든 HTTP 메서드 허용
+        res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
         return res.status(200).json({ message: "게시글을 삭제하였습니다." });
       })
       .catch(() => {
@@ -120,13 +138,16 @@ export const finishToDo: RequestHandler = async (req, res, next) => {
         .status(412)
         .json({ message: "완료/취소 권한이 존재하지 않습니다." });
     } else if (targetTodo.userId === userId) {
-      let date = new Date();
-      const koreantime = date.setHours(date.getHours() + 9);
       await Todos.update(
-        { done: !targetTodo.done, doneAt: koreantime },
+        { done: !targetTodo.done, doneAt: new Date() },
         { where: { todoId: id } }
       );
-
+      res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+      res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+      ); // 모든 HTTP 메서드 허용
+      res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
       return res.status(200).json({ message: "완료/취소 성공!" });
     }
   } catch (error) {
@@ -166,6 +187,12 @@ export const getTodoById: RequestHandler = async (req, res, next) => {
         content: todo.content,
         createdAt: todo.createdAt,
       };
+      res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+      res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+      ); // 모든 HTTP 메서드 허용
+      res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
       res.status(200).json({ todo: result, message: "할일 상세보기 성공" });
     }
   } catch (error) {
@@ -178,7 +205,7 @@ export const getTodoById: RequestHandler = async (req, res, next) => {
 export const updateToDo: RequestHandler = async (req, res, next) => {
   const { userId } = res.locals.user;
   const { id } = req.params;
-  const { title, content } = req.body;
+  const { title, content, duedateAt } = req.body;
 
   // id값으로 찾은 Todos의 userId가 로그인한 userId와 같은지 확인
   const todo = await Todos.findOne({ where: { todoId: id } });
@@ -187,10 +214,19 @@ export const updateToDo: RequestHandler = async (req, res, next) => {
       .status(403)
       .json({ message: "할일이 존재하지 않거나 수정 권한이 없습니다." });
   }
-  let date = new Date();
-  const koreantime = date.setHours(date.getHours() + 9);
-  await todo.update({ title, content, updatedAt: koreantime });
 
+  const result = await todo.update({
+    title,
+    content,
+    updatedAt: new Date(),
+    duedateAt,
+  });
+  res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  ); // 모든 HTTP 메서드 허용
+  res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
   return res.status(200).json({ message: "Todo 할일 수정완료" });
 };
 
@@ -213,6 +249,12 @@ export const getFinishedToDo: RequestHandler = async (req, res, next) => {
     });
 
     if (doneList.length > 0) {
+      res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+      res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+      ); // 모든 HTTP 메서드 허용
+      res.setHeader("Access-Control-Allow-Credentials", "true"); // 클라이언트와 서버 간에 쿠키 주고받기 허용
       res.status(200).json({ doneList: doneList });
     } else if (doneList.length === 0) {
       res.status(400).json({ message: "완료한 할일이 존재하지 않습니다." });

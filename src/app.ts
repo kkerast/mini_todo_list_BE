@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import connection from "./db/config";
 import { json, urlencoded } from "body-parser";
