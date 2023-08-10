@@ -16,7 +16,8 @@ export const signup: RequestHandler = async (req, res, next) => {
         });
         if (isExistNick) {
             // 이미 해당 닉네임으로 가입했다면,
-            res.status(412).json({ errorMessage: "중복된 닉네임입니다." });
+
+            res.status(412).json({ errorMessage: "중복된 닉네임입니다.!!" });
             return;
         }
         const isExistEmail = await Users.findOne({
@@ -27,6 +28,7 @@ export const signup: RequestHandler = async (req, res, next) => {
             res.status(412).json({
                 errorMessage: "중복된 이메일입니다. 몰랑해결!!",
             });
+
             return;
         }
 
