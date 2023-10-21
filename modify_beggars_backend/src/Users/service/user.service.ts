@@ -34,7 +34,7 @@ export class UserService {
       // await this.userRepository.save(query);
        // const queryRunner = this.dataSource.createQueryRunner();
        
-      const query =  await this.userRepository.userSignup(SignupDto,queryRunner:QueryRunner);
+      const query =  await this.userRepository.userSignup(SignupDto,queryRunner);
       await queryRunner.commitTransaction();
 
       return query;

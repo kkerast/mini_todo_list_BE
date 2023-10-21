@@ -55,7 +55,7 @@ import { transcationEntityManager } from 'src/Utils/decorators/transcation.entit
       type: UpdateMypageDto,
       description: '마이페이지 조회',
     })
-    async mypageInfo(@Req() req: any,@transcationEntityManager() manager) {
+    async mypageInfo(@Req() req: any,@transcationEntityManager() transcationEntityManager) {
       //회원정보 확인
       // const { user } = req;
       // let getByUserIdDto = new GetByUserIdDto();
@@ -63,8 +63,9 @@ import { transcationEntityManager } from 'src/Utils/decorators/transcation.entit
       // const result : ListMypageDto = await this.mypageService.mypageInfo(getByUserIdDto);
       // return `{data : ${JSON.stringify(result)}}`;
 
+      
       const { user } = req;
-      return await this.mypageService.mypageInfo(user,manager);
+      return await this.mypageService.mypageInfo(user,transcationEntityManager);
     }
   
     @Put()

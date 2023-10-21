@@ -16,6 +16,7 @@ import { GetByUserIdDto } from '../dto/getByUserId.dto';
 import { ListMypageDto } from '../dto/listMypage.dto';
 import { DeleteFail, ReadFail, UpdateFail } from 'src/Utils/exception.service';
 import { MypageRepository } from '../repository/mypage.repository';
+import { transcationEntityManager } from 'src/Utils/decorators/transcation.entity.manager';
 
 
 @Injectable()
@@ -29,7 +30,7 @@ export class MypageService {
     private readonly userService: UserService, // private readonly fileService: FileService,
   ) {}
 
-  async mypageInfo(getByUserIdDto : GetByUserIdDto) : Promise<ListMypageDto> {
+  async mypageInfo(getByUserIdDto : GetByUserIdDto,transcationEntityManager:any) : Promise<ListMypageDto> {
     try {
       // console.log(' %%%  ===> ' + mypageDto.userId);
       // const result = this.userRepository
@@ -60,8 +61,8 @@ export class MypageService {
       const userObj: User = await this.userInfo(getByUserIdDto);
       //file 체크
       if (file) {
-        console.log(file, '------file-------')
-        console.log('location ' + file.location);
+        // console.log(file, '------file-------')
+        // console.log('location ' + file.location);
         const { location, key } = file;
         updateMypageDto.userImage = location;
       }
